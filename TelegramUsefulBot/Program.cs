@@ -9,7 +9,7 @@ namespace TelegramUsefulBot
     {
         static void Main(string[] args)
         {
-            var bot = new TelegramBotClient("5378738338:AAETL_jMrdSFWF5LMj34Jh29yz11pnHlAsY");
+            var bot = new TelegramBotClient("{YOUR TOKEN HERE}");
 
             var me = bot.GetMeAsync();
             Console.WriteLine($"Hello, World! I am user {me.Id}.");
