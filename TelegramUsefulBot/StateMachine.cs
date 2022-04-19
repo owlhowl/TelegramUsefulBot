@@ -17,7 +17,7 @@ namespace TelegramUsefulBot
         public void SetState(State newState) => state = newState;
 
         internal void UpdateHandler(ITelegramBotClient botClient, Update update)
-        {// передаем команду текущему стейту. Если он ее не сможет обработать, то не судьба
+        {
             state.UpdateHandler(user, botClient, update);
         }
     }

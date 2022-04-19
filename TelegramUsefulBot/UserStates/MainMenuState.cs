@@ -10,6 +10,8 @@ namespace TelegramUsefulBot.UserStates
     {
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
+            await CommonUpdateHandler(user, botClient, update);
+
             if (update.CallbackQuery == null)
                 return;
 
@@ -23,11 +25,9 @@ namespace TelegramUsefulBot.UserStates
 
                 await botClient.SendTextMessageAsync(user.Id,
                     "Снова привет",
-                    ParseMode.Markdown,
                     replyMarkup: replyKeyboardMarkup);
-
-                user.State.SetState(new NewState());
             }
+
             else if (update.CallbackQuery.Data == "main_state2")
             {
                 await botClient.SendTextMessageAsync(user.Id, "2");
