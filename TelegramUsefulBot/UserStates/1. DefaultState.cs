@@ -11,7 +11,6 @@ namespace TelegramUsefulBot.UserStates
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
             await CommonUpdateHandler(user, botClient, update);
-
         }
     }
 }

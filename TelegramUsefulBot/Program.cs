@@ -1,14 +1,23 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using TelegramUsefulBot.DB;
 
 namespace TelegramUsefulBot
 {
     class Program
     {
+        static BotDB db;
+
         static void Main(string[] args)
         {
+            db = new BotDB();
+
             var bot = new TelegramBotClient("5378738338:AAETL_jMrdSFWF5LMj34Jh29yz11pnHlAsY");
 
             var me = bot.GetMeAsync().Result;
@@ -18,12 +27,46 @@ namespace TelegramUsefulBot
 
             ReceiverOptions receiverOptions = new() { AllowedUpdates = { } };
 
-            bot.StartReceiving(Handlers.HandleUpdateAsync, Handlers.HandleErrorAsync, receiverOptions, cts.Token);
+            bot.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cts.Token);
 
             Console.WriteLine($"Start listening on {me.Username}.");
             Console.ReadKey();
 
             cts.Cancel();
+        }
+
+        static Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            long userId = -1;
+
+            if (update.Type == UpdateType.Message)
+                userId = update.Message.From.Id;
+
+            else if (update.Type == UpdateType.CallbackQuery)
+                userId = update.CallbackQuery.From.Id;
+
+            if (db.HasUser(userId))
+                db.GetUser(userId)
+                    .State
+                    .UpdateHandler(botClient, update);
+            else
+                db.AddUser(userId, update.Message?.From.Username)
+                    .State
+                    .UpdateHandler(botClient, update);
+
+            return Task.CompletedTask;
+        }
+
+        static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        {
+            var ErrorMessage = exception switch
+            {
+                ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => exception.ToString()
+            };
+
+            Console.WriteLine(ErrorMessage);
+            return Task.CompletedTask;
         }
     }
 }

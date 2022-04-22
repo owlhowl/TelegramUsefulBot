@@ -6,7 +6,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramUsefulBot.UserStates
 {
-    public class MainMenuState : State
+    public class OrderMakingState : State
     {
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {

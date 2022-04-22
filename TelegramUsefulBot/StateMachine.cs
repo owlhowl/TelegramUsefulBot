@@ -6,17 +6,17 @@ namespace TelegramUsefulBot
     public class StateMachine
     {
         private readonly User user;
-        State state;
+        private State state;
 
-        public StateMachine(User user, State defaultState)
+        public StateMachine(User user, State state)
         {
             this.user = user;
-            SetState(defaultState);
+            SetState(state);
         }
 
         public void SetState(State newState) => state = newState;
 
-        internal void UpdateHandler(ITelegramBotClient botClient, Update update)
+        public void UpdateHandler(ITelegramBotClient botClient, Update update)
         {
             state.UpdateHandler(user, botClient, update);
         }
