@@ -19,7 +19,6 @@ namespace TelegramUsefulBot.DB
 
         public BotDBContext()
         {
-            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 
@@ -69,6 +68,10 @@ namespace TelegramUsefulBot.DB
                     .HasForeignKey(d => d.WorkerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Order_Worker");
+
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasMaxLength(150);
             });
 
             modelBuilder.Entity<ServiceType>(entity =>

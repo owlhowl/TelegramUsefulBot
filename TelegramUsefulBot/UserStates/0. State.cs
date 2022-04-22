@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
-using TelegramUsefulBot.DB;
 using TelegramUsefulBot.UserStates;
 
 namespace TelegramUsefulBot
@@ -19,32 +17,36 @@ namespace TelegramUsefulBot
             if (update.Message == null)
                 return;
 
-            string message = update.Message.Text switch
+            string message = "";
+
+            Action action = update.Message.Text switch
             {
-                "/start" => "Привет! Я умею делать заказы на оказание различных услуг! /help",
-                "/help" => "Чтобы воспользоваться услугами бота, отправьте 120 рублей на карту 5536 9138 9747 6798.",
-                _ => ""
+                "/start" =>
+                    () =>
+                    {
+                        message = "Привет! Я умею делать заказы на оказание различных услуг! /help";
+                        user.State.SetState(new OrderMakeState());
+                    }
+                ,
+                "/cancel" =>
+                    () =>
+                    {
+                        message = "Оформление заказа отменено";
+                        user.CurrentOrder = new Order();
+                        user.State.SetState(new OrderMakeState());
+                    }
+                ,
+                "/help" =>
+                    () => message = "Чтобы воспользоваться услугами бота, отправьте 120 рублей на карту 5536 9138 9747 6798.",
+                _ =>
+                    () => message = ""
             };
 
-            if (string.IsNullOrEmpty(message))
-                return;
+            action.Invoke();
 
             await botClient.SendTextMessageAsync(
                 chatId: user.TelegramId,
                 text: message);
-
-            user.State.SetState(new DefaultState());
-        }
-
-        public InlineKeyboardMarkup GetListKeyboard(IEnumerable<ServiceType> serviceTypes)
-        {
-            var keyboard = new List<List<InlineKeyboardButton>>();
-
-            foreach (var serviceType in serviceTypes)
-                keyboard.Add(new List<InlineKeyboardButton> { InlineKeyboardButton.WithCallbackData(serviceType.Name, serviceType.Id.ToString()) });
-
-            var replyKeyboardMarkup = new InlineKeyboardMarkup(keyboard);
-            return replyKeyboardMarkup;
         }
     }
 }

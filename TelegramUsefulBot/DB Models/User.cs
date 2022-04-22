@@ -12,16 +12,18 @@ namespace TelegramUsefulBot
         public User()
         {
             Orders = new HashSet<Order>();
-            State = new StateMachine(this, new DefaultState());
+            State = new StateMachine(this, new OrderMakeState());
+            CurrentOrder = new Order();
         }
 
         public int Id { get; set; }
         public long TelegramId { get; set; }
         public string Name { get; set; }
-        public long PhoneNumber { get; set; }
         
         [NotMapped]
         public StateMachine State { get; set; }
+        [NotMapped]
+        public Order CurrentOrder { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; }
     }

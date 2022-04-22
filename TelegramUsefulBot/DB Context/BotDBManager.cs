@@ -6,31 +6,23 @@ using System.Threading.Tasks;
 
 namespace TelegramUsefulBot.DB
 {
-    public class BotDB
+    public static class BotDB
     {
-        private readonly BotDBContext dbContext;
-        private List<User> users;
-        private List<Order> orders;
-        private List<Worker> workers;
-        private List<ServiceType> serviceTypes;
+        private static readonly BotDBContext dbContext = BotDBContext.GetDB();
+        private static List<User> users = new List<User>(dbContext.Users);
+        private static List<Order> orders = new List<Order>(dbContext.Orders);
+        private static List<Worker> workers = new List<Worker>(dbContext.Workers);
+        private static List<ServiceType> serviceTypes = new List<ServiceType>(dbContext.ServiceTypes);
 
-        public BotDB()
-        {
-            dbContext = BotDBContext.GetDB();
-            users = new List<User>(dbContext.Users);
-            orders = new List<Order>(dbContext.Orders);
-        }
+        public static bool HasUser(long telegramId) => users.Exists(u => u.TelegramId == telegramId);
+        public static User GetUser(long telegramId) => users.Find(u => u.TelegramId == telegramId);
 
-        public bool HasUser(long id) => users.Exists(u => u.TelegramId == id);
-
-        public User GetUser(long id) => users.Find(u => u.TelegramId == id);
-
-        public User AddUser(long telegramId, string name, long phoneNumber = -1)
+        public static User AddUser(long telegramId, string name)
         {
             if (HasUser(telegramId))
                 return null;
 
-            var user = new User { TelegramId = telegramId, Name = name, PhoneNumber = phoneNumber };
+            var user = new User { TelegramId = telegramId, Name = name };
 
             dbContext.Add(user);
             dbContext.SaveChanges();
@@ -40,27 +32,18 @@ namespace TelegramUsefulBot.DB
             return user;
         }
 
-        public Order GetOrder(long id) => orders.Find(o => o.Id == id);
-
-        public Order AddOrder(int userId, int serviceTypeId, DateTime start, DateTime end)
+        public static List<Order> GetOrders() => orders;
+        public static Order GetOrder(long id) => orders.Find(o => o.Id == id);
+        public static Order AddOrder(int userId, int serviceTypeId, int workerId, string address, DateTime start, DateTime end)
         {
-            int workerId = 0;
-
-            foreach (var worker in workers)
-            {
-                foreach (var order in orders.Where(o => o.WorkerId == worker.Id))
-                {
-                    if (start >= order.StartDateTime && start <= order.EndDateTime)
-                        continue;
-
-                    if (start < order.StartDateTime && end < order.StartDateTime || start > order.EndDateTime && end > order.EndDateTime)
-                        workerId = worker.Id;
-
-
-                }
-            }
-
-            var newOrder = new Order { UserId = userId, WorkerId = workerId, ServiceTypeId = serviceTypeId, StartDateTime = start, EndDateTime = end };
+            var newOrder = new Order { 
+                UserId = userId, 
+                WorkerId = workerId, 
+                ServiceTypeId = serviceTypeId, 
+                StartDateTime = start, 
+                EndDateTime = end,
+                Address = address
+            };
 
             dbContext.Add(newOrder);
             dbContext.SaveChanges();
@@ -69,5 +52,9 @@ namespace TelegramUsefulBot.DB
 
             return newOrder;
         }
+
+        public static List<ServiceType> GetServiceTypes() => serviceTypes;
+
+        public static List<Worker> GetWorkers() => workers;
     }
 }

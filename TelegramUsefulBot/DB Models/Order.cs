@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -13,6 +12,7 @@ namespace TelegramUsefulBot
         public int ServiceTypeId { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
+        public string Address { get; set; }
 
         public virtual ServiceType ServiceType { get; set; }
         public virtual User User { get; set; }

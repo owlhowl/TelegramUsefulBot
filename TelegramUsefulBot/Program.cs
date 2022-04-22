@@ -12,12 +12,8 @@ namespace TelegramUsefulBot
 {
     class Program
     {
-        static BotDB db;
-
         static void Main(string[] args)
         {
-            db = new BotDB();
-
             var bot = new TelegramBotClient("5378738338:AAETL_jMrdSFWF5LMj34Jh29yz11pnHlAsY");
 
             var me = bot.GetMeAsync().Result;
@@ -45,12 +41,18 @@ namespace TelegramUsefulBot
             else if (update.Type == UpdateType.CallbackQuery)
                 userId = update.CallbackQuery.From.Id;
 
-            if (db.HasUser(userId))
-                db.GetUser(userId)
+            else if (update.Type == UpdateType.MyChatMember)
+                userId = update.MyChatMember.From.Id;
+
+            else
+                return Task.CompletedTask;
+
+            if (BotDB.HasUser(userId))
+                BotDB.GetUser(userId)
                     .State
                     .UpdateHandler(botClient, update);
             else
-                db.AddUser(userId, update.Message?.From.Username)
+                BotDB.AddUser(userId, update.Message?.From.Username)
                     .State
                     .UpdateHandler(botClient, update);
 
