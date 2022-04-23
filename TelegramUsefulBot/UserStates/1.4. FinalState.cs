@@ -13,6 +13,9 @@ namespace TelegramUsefulBot.UserStates
             if (update.Message == null)
                 return;
 
+            if (await CommandHandler(user, botClient, update))
+                return;
+
             if (update.Message.Text == "Подтвердить")
             {
                 BotDB.AddOrder(

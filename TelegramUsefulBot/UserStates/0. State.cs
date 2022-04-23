@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -8,45 +9,50 @@ namespace TelegramUsefulBot
 {
     public abstract class State
     {
-        public string Name { get => GetType().Name; }
+        protected Dictionary<string, Func<User, string>> commands = new Dictionary<string, Func<User, string>>() 
+        {
+            { 
+                "/start", (user) =>
+                {
+                    user.State.SetState(new OrderMakeState());
+                    return "Привет! Я умею делать заказы на оказание различных услуг! /help";
+                } 
+            },
+            { 
+                "/cancel", (user) =>
+                {
+                    user.CurrentOrder = new Order();
+                    user.State.SetState(new OrderMakeState());
+                    return "Оформление заказа отменено";
+                }
+            },
+            { 
+                "/help", (user) =>
+                {
+                    return "Чтобы воспользоваться услугами бота, отправьте 120 рублей на карту 5536 9138 9747 6798.";
+                }
+            },
+        };
 
         public abstract Task UpdateHandler(User user, ITelegramBotClient botClient, Update update);
 
-        public async Task CommonUpdateHandler(User user, ITelegramBotClient botClient, Update update)
+        protected async Task<bool> CommandHandler(User user, ITelegramBotClient botClient, Update update)
         {
             if (update.Message == null)
-                return;
+                return false;
 
-            string message = "";
-
-            Action action = update.Message.Text switch
+            foreach (var command in commands)
             {
-                "/start" =>
-                    () =>
-                    {
-                        message = "Привет! Я умею делать заказы на оказание различных услуг! /help";
-                        user.State.SetState(new OrderMakeState());
-                    }
-                ,
-                "/cancel" =>
-                    () =>
-                    {
-                        message = "Оформление заказа отменено";
-                        user.CurrentOrder = new Order();
-                        user.State.SetState(new OrderMakeState());
-                    }
-                ,
-                "/help" =>
-                    () => message = "Чтобы воспользоваться услугами бота, отправьте 120 рублей на карту 5536 9138 9747 6798.",
-                _ =>
-                    () => message = ""
-            };
+                if (update.Message.Text == command.Key)
+                {
+                    await botClient.SendTextMessageAsync(
+                    chatId: user.TelegramId,
+                    text: command.Value.Invoke(user));
+                    return true;
+                }
+            }
 
-            action.Invoke();
-
-            await botClient.SendTextMessageAsync(
-                chatId: user.TelegramId,
-                text: message);
+            return false;
         }
     }
 }

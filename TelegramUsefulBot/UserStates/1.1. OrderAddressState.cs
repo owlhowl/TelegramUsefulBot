@@ -2,7 +2,6 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 using TelegramUsefulBot.DB;
 
 namespace TelegramUsefulBot.UserStates
@@ -15,6 +14,9 @@ namespace TelegramUsefulBot.UserStates
 
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
+            if (await CommandHandler(user, botClient, update))
+                return;
+
             if (update.CallbackQuery == null)
                 return;
 

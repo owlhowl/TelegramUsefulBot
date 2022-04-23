@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -17,22 +16,11 @@ namespace TelegramUsefulBot.UserStates
 
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
-            if (update.CallbackQuery == null)
+            if (await CommandHandler(user, botClient, update))
                 return;
 
-            user.CurrentOrder.StartDateTime = DateTime.Parse(update.CallbackQuery.Data);
-            user.CurrentOrder.EndDateTime = user.CurrentOrder.StartDateTime.AddHours(1);
-
-            await botClient.EditMessageReplyMarkupAsync(
-                chatId: user.TelegramId,
-                messageId: prevMessage.MessageId,
-                replyMarkup: null);
-
-            await botClient.EditMessageTextAsync(
-                chatId: user.TelegramId,
-                messageId: prevMessage.MessageId,
-                parseMode: ParseMode.Markdown,
-                text: $"{prevMessage.Text} *{user.CurrentOrder.StartDateTime.ToShortDateString()} {user.CurrentOrder.StartDateTime.ToShortTimeString()}*");
+            if (update.CallbackQuery == null)
+                return;
 
             foreach (var worker in BotDB.GetWorkers())
                 if (!BotDB.GetOrders().Exists(o => o.StartDateTime == user.CurrentOrder.StartDateTime && o.WorkerId == worker.Id))
