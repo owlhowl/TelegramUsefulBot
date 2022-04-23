@@ -17,11 +17,8 @@ namespace TelegramUsefulBot.UserStates
 
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
-            if (await CommandHandler(user, botClient, update))
+            if (await CommandHandler(user, prevMessage, botClient, update))
                 return;
-
-            if (update.Message != null && string.IsNullOrEmpty(user.CurrentOrder.Address))
-                user.CurrentOrder.Address = update.Message.Text;
             
             if(update.CallbackQuery != null)
             {
@@ -58,32 +55,32 @@ namespace TelegramUsefulBot.UserStates
                     chatId: user.TelegramId,
                     messageId: prevMessage.MessageId,
                     parseMode: ParseMode.Markdown,
-                    text: $"Выберите время на *{selectedDay.ToShortDateString()}*:");
+                    text: $"Выберите время на *{ToLocalDateString(selectedDay)}*:");
 
-                InlineKeyboardMarkup replyKeyboardMarkup = GetDateTimeKeyboard(GetDateTimes(user.CurrentOrder.ServiceType), selectedDay);
+                InlineKeyboardMarkup replyKeyboardMarkup = GetDateTimeKeyboard(GetDateTimes());
 
                 await botClient.EditMessageReplyMarkupAsync(
                     chatId: user.TelegramId,
                     messageId: prevMessage.MessageId,
                     replyMarkup: replyKeyboardMarkup);
-
-                user.State.SetState(this);
             }
-            else
-            {
-                InlineKeyboardMarkup inlineKeyboardMarkup = GetDateTimeKeyboard(GetDateTimes(user.CurrentOrder.ServiceType), selectedDay);
+            else if (update.Message != null && string.IsNullOrEmpty(user.CurrentOrder.Address))
+            { 
+                user.CurrentOrder.Address = update.Message.Text;
+
+                InlineKeyboardMarkup inlineKeyboardMarkup = GetDateTimeKeyboard(GetDateTimes());
 
                 prevMessage = await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
                     parseMode: ParseMode.Markdown,
-                    text: $"Выберите время на *{selectedDay.ToShortDateString()}*:",
+                    text: $"Выберите время на *{ToLocalDateString(selectedDay)}*:",
                     replyMarkup: inlineKeyboardMarkup);
             }
 
             await Task.CompletedTask;
         }
 
-        protected InlineKeyboardMarkup GetDateTimeKeyboard(List<DateTime> dateTimes, DateTime selectedDay)
+        protected InlineKeyboardMarkup GetDateTimeKeyboard(List<DateTime> dateTimes)
         {
             var keyboard = new List<List<InlineKeyboardButton>>();
 
@@ -134,7 +131,7 @@ namespace TelegramUsefulBot.UserStates
             return new InlineKeyboardMarkup(keyboard);
         }
 
-        protected List<DateTime> GetDateTimes(ServiceType serviceType)
+        protected List<DateTime> GetDateTimes()
         {
             List<DateTime> dateTimes = new List<DateTime>();
             var orders = BotDB.GetOrders();

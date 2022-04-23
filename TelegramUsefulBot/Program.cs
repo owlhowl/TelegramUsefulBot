@@ -33,7 +33,7 @@ namespace TelegramUsefulBot
 
         static Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            long userId = -1;
+            long userId;
 
             if (update.Type == UpdateType.Message)
                 userId = update.Message.From.Id;

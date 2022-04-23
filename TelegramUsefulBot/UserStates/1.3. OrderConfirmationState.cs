@@ -16,7 +16,7 @@ namespace TelegramUsefulBot.UserStates
 
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
-            if (await CommandHandler(user, botClient, update))
+            if (await CommandHandler(user, prevMessage, botClient, update))
                 return;
 
             if (update.CallbackQuery == null)
@@ -37,10 +37,10 @@ namespace TelegramUsefulBot.UserStates
                     new List<KeyboardButton> { new KeyboardButton("Назад") }
                 });
 
-            string message = $"*Ваш заказ:*\n\n" +
+            string message = $"Ваш заказ:\n\n" +
                 $"*{newOrder.ServiceType.Name}*\n" +
                 $"по адресу *{newOrder.Address}*\n" +
-                $"*{newOrder.StartDateTime.ToShortDateString()}* " +
+                $"*{ToLocalDateString(newOrder.StartDateTime)}* " +
                 $"с *{newOrder.StartDateTime.ToShortTimeString()}* " +
                 $"до *{newOrder.EndDateTime.ToShortTimeString()}*\n\n" +
                 $"К Вам приедет {newOrder.Worker.Name}\n" +

@@ -13,7 +13,7 @@ namespace TelegramUsefulBot.UserStates
             if (update.Message == null)
                 return;
 
-            if (await CommandHandler(user, botClient, update))
+            if (await CommandHandler(user, null, botClient, update))
                 return;
 
             if (update.Message.Text == "Подтвердить")
@@ -41,14 +41,10 @@ namespace TelegramUsefulBot.UserStates
                 user.State.SetState(new OrderDateTimeState());
                 user.State.UpdateHandler(botClient, update);
 
-                var message = await botClient.SendTextMessageAsync(
+                await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
-                    text: "Назад",
+                    text: "Вы вернулись назад",
                     replyMarkup: new ReplyKeyboardRemove());
-
-                await botClient.DeleteMessageAsync(
-                    chatId: user.TelegramId,
-                    messageId: message.MessageId);
             }
 
             await Task.CompletedTask;

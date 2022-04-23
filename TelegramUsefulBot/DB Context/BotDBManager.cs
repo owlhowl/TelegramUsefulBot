@@ -50,6 +50,14 @@ namespace TelegramUsefulBot.DB
             return newOrder;
         }
 
+        public static void DeleteOrder(Order order)
+        {
+            dbContext.Remove(order);
+            dbContext.SaveChanges();
+
+            orders = new List<Order>(dbContext.Orders);
+        }
+
         public static List<ServiceType> GetServiceTypes() => serviceTypes;
 
         public static List<Worker> GetWorkers() => workers;

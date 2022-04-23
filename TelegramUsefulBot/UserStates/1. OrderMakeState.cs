@@ -11,7 +11,7 @@ namespace TelegramUsefulBot.UserStates
     {
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
-            if (await CommandHandler(user, botClient, update))
+            if (await CommandHandler(user, null, botClient, update))
                 return;
 
             if (update.Message == null)
@@ -31,10 +31,16 @@ namespace TelegramUsefulBot.UserStates
                 user.State.SetState(new OrderAddressState(message));
             }
 
+            if (update.Message.Text == "/list")
+            { 
+                user.State.SetState(new OrderListState());
+                user.State.UpdateHandler(botClient, update);
+            }
+
             await Task.CompletedTask;
         }
 
-        public InlineKeyboardMarkup GetServiceTypesKeyboard(IEnumerable<ServiceType> serviceTypes)
+        private InlineKeyboardMarkup GetServiceTypesKeyboard(IEnumerable<ServiceType> serviceTypes)
         {
             var keyboard = new List<List<InlineKeyboardButton>>();
 
