@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using TelegramUsefulBot.UserStates;
 
@@ -12,7 +11,7 @@ namespace TelegramUsefulBot
         public User()
         {
             Orders = new HashSet<Order>();
-            State = new StateMachine(this, new OrderMakeState());
+            State = new StateMachine(this, new DefaultState());
             CurrentOrder = new Order();
         }
 

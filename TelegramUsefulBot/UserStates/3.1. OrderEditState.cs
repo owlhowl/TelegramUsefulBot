@@ -55,7 +55,7 @@ namespace TelegramUsefulBot.UserStates
 
                     BotDB.DeleteOrder(order);
 
-                    user.State.SetState(new OrderMakeState());
+                    user.State.SetState(new DefaultState());
                 }
 
                 if (update.Message.Text == "Назад")
@@ -65,7 +65,7 @@ namespace TelegramUsefulBot.UserStates
                         text: "Вы вернулись назад",
                         replyMarkup: new ReplyKeyboardRemove());
 
-                    user.State.SetState(new OrderMakeState());
+                    user.State.SetState(new DefaultState());
                 }
 
                 await Task.CompletedTask;

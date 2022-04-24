@@ -28,9 +28,10 @@ namespace TelegramUsefulBot.UserStates
 
                 prevMessage = await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
-                    text: "Список ваших текущих заказов: \n(назад: /cancel)",
+                    text: "Список ваших текущих заказов:",
                     replyMarkup: keyboardMarkup);
             }
+
             else if (update.CallbackQuery != null)
             {
                 if (update.CallbackQuery.Data == "next")

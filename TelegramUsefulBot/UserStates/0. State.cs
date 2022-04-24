@@ -15,16 +15,24 @@ namespace TelegramUsefulBot
             { 
                 "/start", (user) =>
                 {
-                    user.State.SetState(new OrderMakeState());
+                    user.State.SetState(new DefaultState());
                     return "Привет! Я умею делать заказы на оказание различных услуг! /help";
                 } 
             },
             { 
                 "/cancel", (user) =>
-                {
-                    user.CurrentOrder = new Order();
-                    user.State.SetState(new OrderMakeState());
-                    return "Вы вернулись назад";
+                {                        
+                    if (user.State.GetState() is OrderListState or OrderEditState)
+                    {
+                        user.State.SetState(new DefaultState());
+                        return "Вы вернулись назад";
+                    }
+                    else
+                    {
+                        user.State.SetState(new DefaultState());
+                        user.CurrentOrder = new Order();
+                        return "Оформление заказа отменено";
+                    }
                 }
             },
             { 

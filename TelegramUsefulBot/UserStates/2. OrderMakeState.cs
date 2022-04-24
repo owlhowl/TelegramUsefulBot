@@ -7,33 +7,28 @@ using TelegramUsefulBot.DB;
 
 namespace TelegramUsefulBot.UserStates
 {
-    class OrderMakeState : State
+    public class OrderMakeState : State
     {
+        private Message prevMessage;
+
         public override async Task UpdateHandler(User user, ITelegramBotClient botClient, Update update)
         {
-            if (await CommandHandler(user, null, botClient, update))
+            if (await CommandHandler(user, prevMessage, botClient, update))
                 return;
 
-            if (update.Message == null)
-                return;
-
-            if (update.Message.Text == "/order")
+            if (update.Message != null)
             {
-                string text = "Выберите услугу для заказа:";
-
                 InlineKeyboardMarkup inlineKeyboardMarkup = GetServiceTypesKeyboard(BotDB.GetServiceTypes());
 
-                var message = await botClient.SendTextMessageAsync(
+                prevMessage = await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
-                    text: text,
+                    text: "Выберите услугу для заказа:",
                     replyMarkup: inlineKeyboardMarkup);
-
-                user.State.SetState(new OrderAddressState(message));
             }
 
-            if (update.Message.Text == "/list")
-            { 
-                user.State.SetState(new OrderListState());
+            else if (update.CallbackQuery != null)
+            {
+                user.State.SetState(new OrderAddressState(prevMessage));
                 user.State.UpdateHandler(botClient, update);
             }
 

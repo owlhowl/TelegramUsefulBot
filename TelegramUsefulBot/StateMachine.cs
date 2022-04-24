@@ -15,6 +15,7 @@ namespace TelegramUsefulBot
         }
 
         public State SetState(State newState) => state = newState;
+        public State GetState() => state;
 
         public void UpdateHandler(ITelegramBotClient botClient, Update update)
         {
