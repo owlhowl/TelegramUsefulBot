@@ -21,13 +21,14 @@ namespace TelegramUsefulBot.UserStates
         {
             if (update.CallbackQuery != null)
             {
-                string text = $"Ваш заказ:\n\n" +
-                    $"*{order.ServiceType.Name}*\n" +
-                    $"по адресу *{order.Address}*\n" +
-                    $"*{ToLocalDateString(order.StartDateTime)}* " +
-                    $"с *{order.StartDateTime.ToShortTimeString()}* " +
-                    $"до *{order.EndDateTime.ToShortTimeString()}*\n\n" +
-                    $"К Вам приедет {order.Worker.Name}\n" +
+                string text =
+                    $"❗️Ваш заказ:\n\n" +
+                    $"<b>{order.ServiceType.Name}</b>\n" +
+                    $"по адресу <b>{order.Address}</b>\n\n" +
+                    $"<b>{ToLocalDateString(order.StartDateTime)}</b> " +
+                    $"с <b><u>{order.StartDateTime.ToShortTimeString()}</u></b> " +
+                    $"до <b><u>{order.EndDateTime.ToShortTimeString()}</u></b>\n\n" +
+                    $"К Вам приедет <b>{order.Worker.Name}</b>\n" +
                     $"тел. +{order.Worker.PhoneNumber}\n\n";
 
                 ReplyKeyboardMarkup replyKeyboardMarkup = new(
@@ -39,7 +40,7 @@ namespace TelegramUsefulBot.UserStates
                 await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
                     text: text,
-                    parseMode: ParseMode.Markdown,
+                    parseMode: ParseMode.Html,
                     replyMarkup: replyKeyboardMarkup);
 
 

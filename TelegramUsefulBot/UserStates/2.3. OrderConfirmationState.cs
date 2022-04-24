@@ -36,20 +36,21 @@ namespace TelegramUsefulBot.UserStates
                         new List<KeyboardButton> { new KeyboardButton("Назад") }
                     });
 
-                string text = $"Ваш заказ:\n\n" +
-                    $"*{newOrder.ServiceType.Name}*\n" +
-                    $"по адресу *{newOrder.Address}*\n" +
-                    $"*{ToLocalDateString(newOrder.StartDateTime)}* " +
-                    $"с *{newOrder.StartDateTime.ToShortTimeString()}* " +
-                    $"до *{newOrder.EndDateTime.ToShortTimeString()}*\n\n" +
-                    $"К Вам приедет {newOrder.Worker.Name}\n" +
+                string text = 
+                    $"❗️Ваш заказ:\n\n" +
+                    $"<b>{newOrder.ServiceType.Name}</b>\n" +
+                    $"по адресу <b>{newOrder.Address}</b>\n\n" +
+                    $"<b>{ToLocalDateString(newOrder.StartDateTime)}</b> " +
+                    $"с <b><u>{newOrder.StartDateTime.ToShortTimeString()}</u></b> " +
+                    $"до <b><u>{newOrder.EndDateTime.ToShortTimeString()}</u></b>\n\n" +
+                    $"К Вам приедет <b>{newOrder.Worker.Name}</b>\n" +
                     $"тел. +{newOrder.Worker.PhoneNumber}\n\n" +
                     $"Все верно?";
 
                 await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
                     text: text,
-                    parseMode: ParseMode.Markdown,
+                    parseMode: ParseMode.Html,
                     replyMarkup: replyKeyboardMarkup);
             }
 
