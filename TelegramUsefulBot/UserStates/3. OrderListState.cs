@@ -75,39 +75,48 @@ namespace TelegramUsefulBot.UserStates
 
         private InlineKeyboardMarkup GetOrderListKeyboard(List<Order> orders)
         {
-            orders.Sort((o1, o2) => o1.StartDateTime.CompareTo(o2.StartDateTime));
-            var pageOrders = orders.FindAll(o => orders.IndexOf(o) < page * ordersPerPage && orders.IndexOf(o) >= (page-1) * ordersPerPage);
-
             var keyboard = new List<List<InlineKeyboardButton>>();
 
-            foreach (var order in pageOrders)
+            if (orders.Count == 0)
             {
-                string address = order.Address.Length > 28 ? order.Address.Substring(0, 20).TrimEnd(): order.Address;
-                string serviceType = order.ServiceType.Name.Length > 10 ? order.ServiceType.Name.Substring(0, 10).TrimEnd() + "..." : order.ServiceType.Name;
-                string buttonText = $"{order.StartDateTime.ToShortTimeString()} {ToLocalDateString(order.StartDateTime)} | {serviceType} | {address}";
-
-                keyboard.Add(new List<InlineKeyboardButton> { 
-                    InlineKeyboardButton.WithCallbackData(buttonText, order.Id.ToString()) 
+                keyboard.Add(new List<InlineKeyboardButton> {
+                    new InlineKeyboardButton("Нет заказов")
                 });
             }
-
-            if (orders.Count > ordersPerPage)
+            else
             {
-                if (page == 1)
-                    keyboard.Add(new List<InlineKeyboardButton> {
-                        InlineKeyboardButton.WithCallbackData("➡️", "next")
-                    });
+                orders.Sort((o1, o2) => o1.StartDateTime.CompareTo(o2.StartDateTime));
+                var pageOrders = orders.FindAll(o => orders.IndexOf(o) < page * ordersPerPage && orders.IndexOf(o) >= (page - 1) * ordersPerPage);
 
-                if (page > 1 && page < orders.Count / ordersPerPage + 1)
+                foreach (var order in pageOrders)
+                {
+                    string address = order.Address.Length > 28 ? order.Address.Substring(0, 20).TrimEnd() : order.Address;
+                    string serviceType = order.ServiceType.Name.Length > 10 ? order.ServiceType.Name.Substring(0, 10).TrimEnd() + "..." : order.ServiceType.Name;
+                    string buttonText = $"{order.StartDateTime.ToShortTimeString()} {ToLocalDateString(order.StartDateTime)} | {serviceType} | {address}";
+
                     keyboard.Add(new List<InlineKeyboardButton> {
-                            InlineKeyboardButton.WithCallbackData("⬅️", "prev"),
+                        InlineKeyboardButton.WithCallbackData(buttonText, order.Id.ToString())
+                    });
+                }
+
+                if (orders.Count > ordersPerPage)
+                {
+                    if (page == 1)
+                        keyboard.Add(new List<InlineKeyboardButton> {
                             InlineKeyboardButton.WithCallbackData("➡️", "next")
                         });
 
-                if (page == orders.Count / ordersPerPage + 1)
-                    keyboard.Add(new List<InlineKeyboardButton> {
-                        InlineKeyboardButton.WithCallbackData("⬅️", "prev")
-                    });
+                    if (page > 1 && page < orders.Count / ordersPerPage + 1)
+                        keyboard.Add(new List<InlineKeyboardButton> {
+                                InlineKeyboardButton.WithCallbackData("⬅️", "prev"),
+                                InlineKeyboardButton.WithCallbackData("➡️", "next")
+                            });
+
+                    if (page == orders.Count / ordersPerPage + 1)
+                        keyboard.Add(new List<InlineKeyboardButton> {
+                            InlineKeyboardButton.WithCallbackData("⬅️", "prev")
+                        });
+                }
             }
 
             return new InlineKeyboardMarkup(keyboard);

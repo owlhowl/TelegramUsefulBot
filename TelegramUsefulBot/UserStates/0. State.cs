@@ -16,7 +16,7 @@ namespace TelegramUsefulBot
                 "/start", (user) =>
                 {
                     user.State.SetState(new DefaultState());
-                    return "Привет! Я умею делать заказы на оказание различных услуг! /help";
+                    return "Привет! Я умею делать заказы на оказание различных услуг!\nЧтобы узнать больше, введите /help";
                 } 
             },
             { 
@@ -38,7 +38,10 @@ namespace TelegramUsefulBot
             { 
                 "/help", (user) =>
                 {
-                    return "Чтобы воспользоваться услугами бота, отправьте 120 рублей на карту 5536 9138 9747 6798.";
+                    return "*Список доступных команд бота:*\n" +
+                    "/order - начать оформление заказа\n" +
+                    "/list - список текущих заказов\n" +
+                    "/cancel - отмена текущего действия";
                 }
             }
         };
@@ -56,6 +59,7 @@ namespace TelegramUsefulBot
                 {
                     await botClient.SendTextMessageAsync(
                         chatId: user.TelegramId,
+                        parseMode: ParseMode.Markdown,
                         text: command.Value.Invoke(user));
 
                     if (prevMessage != null)

@@ -63,10 +63,11 @@ namespace TelegramUsefulBot.UserStates
                 {
                     await botClient.SendTextMessageAsync(
                         chatId: user.TelegramId,
-                        text: "Вы вернулись назад",
+                        text: "Вы вернулись к списку",
                         replyMarkup: new ReplyKeyboardRemove());
 
-                    user.State.SetState(new DefaultState());
+                    user.State.SetState(new OrderListState());
+                    user.State.UpdateHandler(botClient, update);
                 }
 
                 await Task.CompletedTask;
