@@ -34,7 +34,7 @@ namespace TelegramUsefulBot.UserStates
                     new List<List<KeyboardButton>> {
                         new List<KeyboardButton> { new KeyboardButton("Подтвердить") },
                         new List<KeyboardButton> { new KeyboardButton("Назад") }
-                    });
+                    }) { ResizeKeyboard = true, OneTimeKeyboard = true };
 
                 string text = 
                     $"❗️Ваш заказ:\n\n" +

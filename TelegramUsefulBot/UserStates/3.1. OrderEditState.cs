@@ -35,7 +35,7 @@ namespace TelegramUsefulBot.UserStates
                     new List<List<KeyboardButton>> {
                         new List<KeyboardButton> { new KeyboardButton("Отменить заказ") },
                         new List<KeyboardButton> { new KeyboardButton("Назад") }
-                    });
+                    }) { ResizeKeyboard = true, OneTimeKeyboard = true };
 
                 await botClient.SendTextMessageAsync(
                     chatId: user.TelegramId,
